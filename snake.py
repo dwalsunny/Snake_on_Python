@@ -3,6 +3,28 @@
 import pygame, sys, time, random
 from pygame.locals import *
 
+def gameOver():
+        gameOverFont = pygame.font.Font('freesansbold.ttf', 72)
+        gameOverSurf = gameOverFont.render('Game Over', True, greyColour)
+        gameOverRect = gameOverSurf.get_rect()
+        gameOverRect.midtop = (320, 10)
+        playSurface.blit(gameOverSurf, gameOverRect)
+        pygame.display.flip()
+        time.sleep(2)
+        Reset()
+
+def Reset():
+        Kobra.default()
+        Draw()
+
+def Draw():
+        playSurface.fill(blackColour)
+        for position in Kobra.getsnakeSegments():
+                pygame.draw.rect(playSurface,whiteColour, Rect(position[0], position[1], 20 ,20))
+        raspPosition = Kobra.getraspberryPosition()
+        pygame.draw.rect(playSurface,redColour, Rect(raspPosition[0],raspPosition[1], 20 , 20))
+        pygame.display.flip()
+
 
 class Snake:
         __snakePosition = [0,0]
@@ -13,9 +35,9 @@ class Snake:
         __changeDirection = __direction
 
         def __init__(self, snakePosition, snakeSegments, raspberryPosition, raspberrySpawned, direction):
-               self.__snakePosition = snakePosition
-               self.__snakeSegments = snakeSegments
-               self.__raspberryPosition = raspberryPosition
+               self.__snakePosition = list(snakePosition)
+               self.__snakeSegments = list(snakeSegments)
+               self.__raspberryPosition = list(raspberryPosition)
                self.__raspberrySpawned = raspberrySpawned
                self.__direction = direction
                self.__changeDirection = direction
@@ -71,29 +93,6 @@ class Snake:
                 self.__snakeSegments.pop()
 
 
-def gameOver():
-        gameOverFont = pygame.font.Font('freesansbold.ttf', 72)
-        gameOverSurf = gameOverFont.render('Game Over', True, greyColour)
-        gameOverRect = gameOverSurf.get_rect()
-        gameOverRect.midtop = (320, 10)
-        playSurface.blit(gameOverSurf, gameOverRect)
-        pygame.display.flip()
-        time.sleep(2)
-        Reset()
-
-def Reset():
-        Kobra.default()
-        Draw()
-
-def Draw():
-        playSurface.fill(blackColour)
-        for position in Kobra.getsnakeSegments():
-                pygame.draw.rect(playSurface,whiteColour, Rect(position[0], position[1], 20 ,20))
-        raspPosition = Kobra.getraspberryPosition()
-   tr     pygame.draw.rect(playSurface,redColour, Rect(raspPosition[0],raspPosition[1], 20 , 20))
-        pygame.display.flip()
-
-
 pygame.init()
 fpsClock = pygame.time.Clock()
 playSurface = pygame.display.set_mode((640, 480))
@@ -121,13 +120,13 @@ while True:
                         if event.key == K_ESCAPE:
                                 pygame.event.post(pygame.event.Event(QUIT))
         if Kobra.getchangeDirection() == 'right' and not Kobra.getdirection() == 'left':
-                Kobra.setdirection(Kobra.getchangeDirection) 
+                Kobra.setdirection(Kobra.getchangeDirection()) 
         if Kobra.getchangeDirection() == 'left' and not Kobra.getdirection() == 'right':
-                Kobra.setdirection(Kobra.getchangeDirection) 
+                Kobra.setdirection(Kobra.getchangeDirection()) 
         if Kobra.getchangeDirection() == 'up' and not Kobra.getdirection() == 'down':
-                Kobra.setdirection(Kobra.getchangeDirection) 
-        if Kobra.getchangeDirection == 'down' and not Kobra.getdirection == 'up':
-                Kobra.setdirection(Kobra.getchangeDirection) 
+                Kobra.setdirection(Kobra.getchangeDirection()) 
+        if Kobra.getchangeDirection() == 'down' and not Kobra.getdirection() == 'up':
+                Kobra.setdirection(Kobra.getchangeDirection()) 
         positionCheck = Kobra.getsnakePosition()
         if Kobra.getdirection() == 'right':
                 positionCheck[0] += 20
@@ -137,7 +136,8 @@ while True:
                 positionCheck[1] -= 20
         if Kobra.getdirection() == 'down':
                 positionCheck[1] += 20
-        Kobra.setSnakePosition(positionCheck)        
+        Kobra.setSnakePosition(positionCheck) 
+
         Kobra.insert()
         if Kobra.getsnakePosition() == Kobra.getraspberryPosition():
                 Kobra.setraspberrySpawned(0)
@@ -156,9 +156,10 @@ while True:
         if positionCheck[1] > 460 or positionCheck[1] < 0:
                 gameOver()
                 continue
-        segmentCheck = Kobra.getsnakeSegments()
+        segmentCheck = list(Kobra.getsnakeSegments())
         for snakeBody in segmentCheck[1:]:
                 if Kobra.getsnakePosition() == snakeBody:
                         gameOver()
                         continue
         fpsClock.tick(20)
+
